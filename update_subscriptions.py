@@ -1,6 +1,33 @@
-from woocommerce import API
+import os
+import smtplib
+from email.mime.text import MIMEText
+import traceback
 import requests
+from woocommerce import API
 import concurrent.futures
+
+# Konfiguracja SMTP
+smtp_server = "smtp.zenbox.pl"
+smtp_port = 587
+smtp_username = os.environ.get('SMTP_USERNAME')
+smtp_password = os.environ.get('SMTP_PASSWORD')
+email_recipient = "slawomir.oruba@gmail.com"  # Wpisz adres e-mail odbiorcy
+
+def send_error_email(subject, body):
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = smtp_username
+    msg['To'] = email_recipient
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        server.sendmail(smtp_username, [email_recipient], msg.as_string())
+        server.quit()
+        print("Wysłano e-mail z informacją o błędzie.")
+    except Exception as e:
+        print(f"Błąd podczas wysyłania e-maila: {e}")
 
 wcapi = API(
     url="https://umk.jacekwalkiewicz.pl",  # Adres URL sklepu
@@ -114,39 +141,46 @@ def update_contacts_in_parallel(updates):
                 print(f"Wystąpił błąd: {e}")
 
 def main():
-    # Pobierz customFieldId dla 'active_subscription'
-    custom_field_id = get_custom_field_id('active_subscription')
-    if not custom_field_id:
-        print("Pole 'active_subscription' nie istnieje w GetResponse.")
-        return
+    try:
+        custom_field_id = get_custom_field_id('active_subscription')
+        if not custom_field_id:
+            print("Pole 'active_subscription' nie istnieje w GetResponse.")
+            return
 
-    # Pobierz wszystkie subskrypcje z WooCommerce
-    subscriptions = get_all_subscriptions()
-    subscription_data = extract_subscription_data(subscriptions)
+        # Pobierz wszystkie subskrypcje z WooCommerce
+        subscriptions = get_all_subscriptions()
+        subscription_data = extract_subscription_data(subscriptions)
 
-    # Pobierz ID kampanii (listy) 'Jacek Walkiewicz'
-    campaign_id = get_campaign_id('Jacek Walkiewicz')
-    if not campaign_id:
-        print("Kampania 'Jacek Walkiewicz' nie istnieje w GetResponse.")
-        return
+        # Pobierz ID kampanii (listy) 'Jacek Walkiewicz'
+        campaign_id = get_campaign_id('Jacek Walkiewicz')
+        if not campaign_id:
+            print("Kampania 'Jacek Walkiewicz' nie istnieje w GetResponse.")
+            return
 
-    # Pobierz wszystkie kontakty z kampanii
-    contacts = get_all_contacts_from_campaign(campaign_id)
-    email_contact_map = build_email_contact_map(contacts)
+        # Pobierz wszystkie kontakty z kampanii
+        contacts = get_all_contacts_from_campaign(campaign_id)
+        email_contact_map = build_email_contact_map(contacts)
 
-    # Przygotuj listę aktualizacji
-    updates = []
-    for email, status in subscription_data.items():
-        email_lower = email.lower()
-        if email_lower in email_contact_map:
-            contact_id = email_contact_map[email_lower]
-            active_value = '1' if status == 'active' else '0'
-            updates.append((contact_id, email, custom_field_id, active_value))
-        else:
-            print(f"Kontakt {email} nie znaleziony w GetResponse.")
+        # Przygotuj listę aktualizacji
+        updates = []
+        for email, status in subscription_data.items():
+            email_lower = email.lower()
+            if email_lower in email_contact_map:
+                contact_id = email_contact_map[email_lower]
+                active_value = '1' if status == 'active' else '0'
+                updates.append((contact_id, email, custom_field_id, active_value))
+            else:
+                print(f"Kontakt {email} nie znaleziony w GetResponse.")
 
-    # Wykonaj aktualizacje równolegle
-    update_contacts_in_parallel(updates)
+        # Wykonaj aktualizacje równolegle
+        update_contacts_in_parallel(updates)
+
+    except Exception as e:
+        error_message = ''.join(traceback.format_exception(None, e, e.__traceback__))
+        subject = "Błąd w skrypcie update_subscriptions.py"
+        body = f"Wystąpił błąd podczas wykonywania skryptu:\n\n{error_message}"
+        send_error_email(subject, body)
+        print("Wystąpił błąd. Wysłano e-mail z informacją o błędzie.")
 
 if __name__ == "__main__":
     main()
