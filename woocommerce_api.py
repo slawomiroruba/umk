@@ -10,7 +10,7 @@ def get_wcapi():
         consumer_secret=WC_CONSUMER_SECRET,
         wp_api=True,
         version="wc/v3",
-        timeout=10
+        timeout=30
     )
     return wcapi
 
