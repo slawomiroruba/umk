@@ -54,23 +54,25 @@ def main():
 
         contacts = get_all_contacts_from_campaign(campaign_id)
         email_contact_map = build_email_contact_map(contacts)
-
+        print(f"Found {len(email_contact_map)} contacts in the campaign.")
         updates = []
         for email, status in subscription_data.items():
             email_lower = email.lower()
+            print(f"Processing {email} ({subscription_names[email]}): {status}")
             active_value = '1' if status == 'active' else '0'
             if email_lower in email_contact_map:
                 contact_id = email_contact_map[email_lower]
-                updates.append((contact_id, email, custom_field_id, active_value))
+
+                # Pobierz aktualną wartość pola niestandardowego z GetResponse
+                current_gr_status = get_contact_custom_field_value(contact_id, custom_field_id)
+                print(f"Current status for {email}: {current_gr_status}, Active status: {active_value}")
+                # Porównaj statusy i zaktualizuj tylko, jeśli się różnią
+                if current_gr_status != active_value:
+                    updates.append((contact_id, email, custom_field_id, active_value))
+                else:
+                    print(f"Skipping update for {email}: Status is the same in both systems.")
             else:
                 print(f"Contact {email} not found in GetResponse.")
-                # name = subscription_names.get(email, '')
-                # new_contact = create_contact_in_getresponse(email, name, campaign_id)
-                # if new_contact:
-                #     contact_id = new_contact['contactId']
-                #     updates.append((contact_id, email, custom_field_id, active_value))
-                # else:
-                #     logging.error(f"Failed to create or retrieve contact ID for {email}.")
 
         if updates:
             update_contacts_in_parallel(updates)

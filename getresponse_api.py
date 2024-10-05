@@ -9,6 +9,36 @@ headers = {
     "Content-Type": "application/json"
 }
 
+def get_contact_custom_field_value(contact_id, custom_field_id):
+    """
+    Pobiera wartość niestandardowego pola dla kontaktu z GetResponse.
+    
+    :param contact_id: ID kontaktu w GetResponse.
+    :param custom_field_id: ID niestandardowego pola (custom field).
+    :return: Wartość pola niestandardowego lub None, jeśli pole nie istnieje.
+    """
+    try:
+        # Pobierz szczegóły kontaktu z GetResponse
+        response = requests.get(f"{GETRESPONSE_API_URL}/contacts/{contact_id}", headers=headers)
+        
+        if response.status_code == 200:
+            contact_details = response.json()
+
+            # Sprawdź, czy kontakt ma przypisane niestandardowe pola
+            if 'customFieldValues' in contact_details:
+                for field in contact_details['customFieldValues']:
+                    if field['customFieldId'] == custom_field_id:
+                        # Zwróć wartość pola (zakładam, że pole może mieć jedną wartość)
+                        return field['value'][0] if field['value'] else None
+            return None
+        else:
+            logging.error(f"Error retrieving contact {contact_id}: status_code = {response.status_code}, Response: {response.text}")
+            return None
+    except Exception as e:
+        logging.error(f"Failed to get custom field value for contact {contact_id}: {e}")
+        return None
+
+
 def get_campaign_id(campaign_name):
     """Get the campaign ID for a given campaign name."""
     params = {"query[name]": campaign_name}

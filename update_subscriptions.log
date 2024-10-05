@@ -1,0 +1,68 @@
+2024-10-05 13:30:31,053 - ERROR - An error occurred: Traceback (most recent call last):
+  File "/root/umk/cron_update_subscriptions_status.py", line 62, in main
+    woocommerce_status = get_woocommerce_status(email)
+NameError: name 'get_woocommerce_status' is not defined
+
+2024-10-05 13:32:13,241 - ERROR - An error occurred: Traceback (most recent call last):
+  File "/root/umk/cron_update_subscriptions_status.py", line 66, in main
+    current_gr_status = get_contact_custom_field_value(contact_id, custom_field_id)
+NameError: name 'get_contact_custom_field_value' is not defined
+
+2024-10-05 13:32:19,602 - ERROR - Error sending email: Traceback (most recent call last):
+  File "/root/umk/cron_update_subscriptions_status.py", line 66, in main
+    current_gr_status = get_contact_custom_field_value(contact_id, custom_field_id)
+NameError: name 'get_contact_custom_field_value' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/umk/utils.py", line 26, in send_error_email
+    server.login(SMTP_USERNAME, SMTP_PASSWORD)
+  File "/usr/lib/python3.10/smtplib.py", line 739, in login
+    (code, resp) = self.auth(
+  File "/usr/lib/python3.10/smtplib.py", line 652, in auth
+    authobject(challenge).encode('ascii'), eol='')
+AttributeError: 'NoneType' object has no attribute 'encode'
+
+2024-10-05 13:33:07,807 - ERROR - An error occurred: Traceback (most recent call last):
+  File "/root/umk/cron_update_subscriptions_status.py", line 66, in main
+    current_gr_status = get_contact_custom_field_value(contact_id, custom_field_id)
+NameError: name 'get_contact_custom_field_value' is not defined
+
+2024-10-05 13:33:14,075 - ERROR - Error sending email: Traceback (most recent call last):
+  File "/root/umk/cron_update_subscriptions_status.py", line 66, in main
+    current_gr_status = get_contact_custom_field_value(contact_id, custom_field_id)
+NameError: name 'get_contact_custom_field_value' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/umk/utils.py", line 26, in send_error_email
+    server.login(SMTP_USERNAME, SMTP_PASSWORD)
+  File "/usr/lib/python3.10/smtplib.py", line 739, in login
+    (code, resp) = self.auth(
+  File "/usr/lib/python3.10/smtplib.py", line 652, in auth
+    authobject(challenge).encode('ascii'), eol='')
+AttributeError: 'NoneType' object has no attribute 'encode'
+
+2024-10-05 13:34:11,347 - ERROR - An error occurred: Traceback (most recent call last):
+  File "/root/umk/cron_update_subscriptions_status.py", line 67, in main
+    current_gr_status = get_contact_custom_field_value(contact_id, custom_field_id)
+NameError: name 'get_contact_custom_field_value' is not defined
+
+2024-10-05 13:34:17,152 - ERROR - Error sending email: Traceback (most recent call last):
+  File "/root/umk/cron_update_subscriptions_status.py", line 67, in main
+    current_gr_status = get_contact_custom_field_value(contact_id, custom_field_id)
+NameError: name 'get_contact_custom_field_value' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/root/umk/utils.py", line 26, in send_error_email
+    server.login(SMTP_USERNAME, SMTP_PASSWORD)
+  File "/usr/lib/python3.10/smtplib.py", line 739, in login
+    (code, resp) = self.auth(
+  File "/usr/lib/python3.10/smtplib.py", line 652, in auth
+    authobject(challenge).encode('ascii'), eol='')
+AttributeError: 'NoneType' object has no attribute 'encode'
+
